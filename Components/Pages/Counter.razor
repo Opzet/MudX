@@ -1,0 +1,45 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Counter</MudText>
+
+<MudPaper Class="pa-16 ma-2" Elevation="2">
+    <MudText Typo="Typo.h6" Align="Align.Center">
+        Current count: @currentCount
+    </MudText>
+    
+    <div class="d-flex justify-center ma-4">
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Primary" 
+                   Size="Size.Large"
+                   StartIcon="Icons.Material.Filled.Add"
+                   @onclick="IncrementCount">
+            Click me
+        </MudButton>
+        
+        <MudButton Variant="Variant.Outlined" 
+                   Color="Color.Secondary" 
+                   Size="Size.Large"
+                   StartIcon="Icons.Material.Filled.Refresh"
+                   Class="ml-2"
+                   @onclick="ResetCount">
+            Reset
+        </MudButton>
+    </div>
+</MudPaper>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+    
+    private void ResetCount()
+    {
+        currentCount = 0;
+    }
+}
