@@ -1,0 +1,25 @@
+What design flow is recommended?
+
+ 
+
+Our preferred design flow is to model and simulate in MATLAB, implement and validate the modem using fixed-point arithmetic in C, and ultimately use the C model as a reference to implement the modem in VHDL.
+
+ 
+
+MATLAB is a great tool for prototyping ideas very quickly. A few lines of Matlab can easily capture the essence of an idea that could take hours to implement in C. The goal of the ASD-B core MATLAB script is to simulate the end to end performance of the ADS-B waveform and observe how the modem reacts to expected channel effects (such as fading), and receiver phenomenon (such as DC offsets, clipping, quantization).
+
+ 
+
+It is in this stage of the design that the acquisition, equalization, and decoding algorithms are developed.
+
+ 
+
+Many of the channel effects, and receiver phenomenon are random number processes which means the only way to get a good understanding for the modem’s performance is to simulate many packets with similar perturbations. Some parameters such SNR, and multipath require sweeping, for example sweeping SNR from -5 dB to 3dB with 0.25dB increments is a good idea when working with a waveform that necessitates 1dB of SNR. Simulations where the SNR is swept across such a range is usually referred to as a BER (Bit Error Rate) curve and is one of the fundamental ways of characterizing the performance of a receiver.
+
+ 
+
+Once the receiver architecture is validated by good simulated BER and PER (Packet Error Rate) performance, it is time to implement the modem. Going to VHDL may seem appealing at this point however it is much more time efficient to implement the modem in C. The MATLAB model uses floating point arithmetic and most of the operations are performed on vectors whereas the final VHDL implementation will be a pipelined fixed point arithmetic implementation. There are far too many design decisions that need to be made and validated in going from MATLAB to VHDL, a good intermediary step is to implement the modem in C. C provides 64bit fixed point data types and arithmetic operations, complements of the underlying x86 processor, that perfectly emulate how the VHDL implementation will work. The C implementation will work as an easy to debug implementation and good reference point for how the VHDL should behave.
+
+ 
+
+The final translation to VHDL from a fixed-point C implementation is not without challenges. The greatest challenge in implementing the modem in VHDL is, as almost always, meeting timing closure. Almost all additions can fit in one clock cycle. Some multiplications can fit in one clock system, others may not. And almost no divisions can happen in less than N/2 clock cycles (where N is the number of bits in the dividend). These simple heuristics can be used as a rule of thumb for designing the arithmetic pipelines but there will still likely be timing problems that will have to be resolved.
